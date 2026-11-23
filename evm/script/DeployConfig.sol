@@ -59,7 +59,7 @@ abstract contract DeployConfig is Script {
             "artifact EVM revision mismatch"
         );
         require(
-            vm.parseJsonBool(artifact, ".metadata.settings.optimizer.enabled") && profile.optimizerRuns == 200
+            vm.parseJsonBool(artifact, ".metadata.settings.optimizer.enabled") && profile.optimizerRuns == 50
                 && profile.viaIR,
             "artifact optimizer profile mismatch"
         );

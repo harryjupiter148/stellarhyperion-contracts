@@ -183,7 +183,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
         uint256 gross;
         address adapterAddress;
     }
-
     mapping(uint64 claimId => PendingClaim claim) private _claims;
     // New nonupgradeable deployments place reviewed action identity in the former record slot;
     // the immutable provenance child owns historical payload storage. No migration is performed.
@@ -233,7 +232,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
         flowWindow = flowWindow_;
         emit ConfigChanged(treasury_, feeBps_, timelockDelay_, flowWindow_);
     }
-
     /// @notice Accepts the native currency an adapter did not spend.
     /// @dev Adapters hand back whatever native currency the rail did not want. Without this the
     /// refund at the end of `bridgeOut` would have nothing to refund.
@@ -275,11 +273,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
         returns (uint64 nonce)
     {
         return _bridgeOut(request, msg.sender);
-    }
-
-    /// @inheritdoc IHyperionRouter
-    function withdrawRefundCredit() external override nonReentrant {
-        _withdrawRefundCredit(payable(msg.sender));
     }
 
     /// @inheritdoc IHyperionRouter
@@ -511,7 +504,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
                 && (request.destination.mappingRevision == 0
                     || request.destination.remoteDecimals != request.destinationDecimals)
         ) revert StaleMapping();
-
         (uint256 fee, uint256 net, address adapterAddress) = OUTBOUND_PROVENANCE.previewOutbound(request);
 
         // The flow limit is charged against what crosses, not against what the sender handed
@@ -763,8 +755,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
                     OutboundProvenance.quoteV2, (route, token, amount, destination, destinationDecimals)
                 )
             );
-        // Forward the immutable child's exact quote schema without a second struct codec.
-        // solhint-disable-next-line no-inline-assembly
         assembly ("memory-safe") {
             pop(v)
             if iszero(ok) { revert(add(result, 32), mload(result)) }
@@ -783,8 +773,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
             .staticcall(
                 abi.encodeCall(OutboundProvenance.quoteAll, (token, amount, destination, destinationDecimals))
             );
-        // The immutable child returns the exact legacy array ABI, including any revert bytes.
-        // solhint-disable-next-line no-inline-assembly
         assembly ("memory-safe") {
             pop(quotes)
             if iszero(ok) { revert(add(result, 32), mload(result)) }
@@ -803,9 +791,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
     {
         (bool ok, bytes memory result) = address(OUTBOUND_PROVENANCE)
             .staticcall(abi.encodeCall(OutboundProvenance.checkDestination, (strkey)));
-        // Forward the immutable pure parser's exact fixed tuple and errors without another codec.
-        // This method is external, so RETURN cannot terminate an internal Solidity caller.
-        // solhint-disable-next-line no-inline-assembly
         assembly ("memory-safe") {
             pop(kind)
             pop(key)
@@ -922,13 +907,6 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
     }
 
     /// @inheritdoc IHyperionRouter
-    /// @dev Guardian can cancel as well as admin. Somebody who can only stop things should be
-    /// able to stop a queued change they think is a mistake.
-    function cancelAction(uint64 id) external override {
-        _cancelAction(id, CancelReason.Unspecified, "");
-    }
-
-    /// @inheritdoc IHyperionRouter
     function cancelActionWithReason(uint64 id, CancelReason reason, string calldata note) external override {
         _cancelAction(id, reason, note);
     }
@@ -992,27 +970,14 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
     }
 
     /// @inheritdoc IHyperionRouter
-    function adapter(RouteKind route) external view override returns (address) {
-        return _adapters[route];
-    }
-
-    /// @inheritdoc IHyperionRouter
     function outboundRecord(uint64 nonce) external view override returns (OutboundRecord memory record) {
         (bool ok, bytes memory result) = address(OUTBOUND_PROVENANCE)
             .staticcall(abi.encodeCall(OutboundProvenance.outboundRecord, (nonce)));
-        // The immutable router-owned child returns this exact public ABI. Forwarding its bytes
-        // avoids a second dynamic-string decode and encode while preserving revert data.
-        // solhint-disable-next-line no-inline-assembly
         assembly ("memory-safe") {
             pop(record)
             if iszero(ok) { revert(add(result, 32), mload(result)) }
             return(add(result, 32), mload(result))
         }
-    }
-
-    /// @notice The contract allowed to call `bridgeIn` for a rail.
-    function railReceiver(RouteKind route) external view returns (address) {
-        return _railReceivers[route];
     }
 
     /// @inheritdoc IHyperionRouter
@@ -1029,6 +994,16 @@ contract HyperionRouter is IHyperionRouter, AccessControl, Pausable, ReentrancyG
     /// @notice How many privileged changes have been queued since deployment.
     function actionCount() external view returns (uint64) {
         return _actionCount;
+    }
+
+    /// @inheritdoc IHyperionRouter
+    function adapter(RouteKind route) external view override returns (address) {
+        return _adapters[route];
+    }
+
+    /// @notice The contract allowed to call `bridgeIn` for a rail.
+    function railReceiver(RouteKind route) external view returns (address) {
+        return _railReceivers[route];
     }
 
     // -------------------------------------------------------------------------------------

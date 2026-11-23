@@ -102,6 +102,10 @@ export AXELAR_STELLAR_CHAIN=stellar
 # deployment record, which is why neither side can be deployed without reference to the other.
 export STELLAR_RAIL_RECIPIENT=0x0d1ea8b866708fdad0f4ed8c677cf4fe66e56a247837266036e4e0f3d05c7b10
 export STELLAR_AXELAR_PEER=0x0d1ea8b866708fdad0f4ed8c677cf4fe66e56a247837266036e4e0f3d05c7b10
+# Local stand-in for the 32-byte Stellar CCTP USDC asset identity. It is stored in the
+# deployment record and compared through phase two and verification; it never claims to be a
+# real testnet/mainnet asset identity.
+export STELLAR_CCTP_TOKEN=0x0000000000000000000000000000000000000000000000000000000000000001
 
 note "phase one: deploy and queue"
 DEPLOY_LOG=/tmp/hyperion-deploy.log

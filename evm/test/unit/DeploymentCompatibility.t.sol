@@ -42,20 +42,20 @@ contract DeploymentCompatibilityTest is Test {
     }
 
     function test_actualMetadataRejectsFalseLabelsAndUnsupportedBuildSettings() public {
-        string memory good = _artifact("0.8.28+commit.7893614a", "cancun", "true", "200", "true");
+        string memory good = _artifact("0.8.28+commit.7893614a", "cancun", "true", "50", "true");
         DeployConfig.CompatibilityProfile memory profile = harness.profile(good);
         assertEq(profile.compilerVersion, "0.8.28+commit.7893614a");
         assertEq(profile.evmVersion, "cancun");
         vm.expectRevert("artifact compiler revision mismatch");
-        harness.profile(_artifact("0.8.27+commit.40a35a09", "cancun", "true", "200", "true"));
+        harness.profile(_artifact("0.8.27+commit.40a35a09", "cancun", "true", "50", "true"));
         vm.expectRevert("artifact EVM revision mismatch");
-        harness.profile(_artifact("0.8.28+commit.7893614a", "shanghai", "true", "200", "true"));
+        harness.profile(_artifact("0.8.28+commit.7893614a", "shanghai", "true", "50", "true"));
         vm.expectRevert("artifact optimizer profile mismatch");
-        harness.profile(_artifact("0.8.28+commit.7893614a", "cancun", "false", "200", "true"));
+        harness.profile(_artifact("0.8.28+commit.7893614a", "cancun", "false", "50", "true"));
         vm.expectRevert("artifact optimizer profile mismatch");
         harness.profile(_artifact("0.8.28+commit.7893614a", "cancun", "true", "1000", "true"));
         vm.expectRevert("artifact optimizer profile mismatch");
-        harness.profile(_artifact("0.8.28+commit.7893614a", "cancun", "true", "200", "false"));
+        harness.profile(_artifact("0.8.28+commit.7893614a", "cancun", "true", "50", "false"));
     }
 
     function _artifact(

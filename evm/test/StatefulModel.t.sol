@@ -222,7 +222,10 @@ contract RouterModelDriver is Fixture {
         } else if (kind == 7) {
             payload = abi.encodeCall(HyperionRouter.executeAction, (queueBase + (arg % 20 + 1).toUint64()));
         } else {
-            payload = abi.encodeCall(HyperionRouter.cancelAction, (queueBase + (arg % 20 + 1).toUint64()));
+            payload = abi.encodeCall(
+                HyperionRouter.cancelActionWithReason,
+                (queueBase + (arg % 20 + 1).toUint64(), CancelReason.Unspecified, "")
+            );
         }
         vm.prank(caller);
         bytes memory data;

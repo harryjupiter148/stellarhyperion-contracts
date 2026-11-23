@@ -241,8 +241,6 @@ interface IHyperionRouter {
         returns (uint64 nonce);
 
     /// @notice Withdraw the caller's previously recorded native refund credit.
-    function withdrawRefundCredit() external;
-
     /// @notice Withdraw the caller's credit to a recipient they authorize.
     /// @dev Enables recovery for beneficiaries whose own receive function always rejects native currency.
     /// A failed delivery reverts and preserves the caller's credit.
@@ -450,8 +448,6 @@ interface IHyperionRouter {
 
     /// @notice Drop a proposed change.
     /// @param id The action to drop.
-    function cancelAction(uint64 id) external;
-
     /// @notice Drop a proposed change with a structured reason code and bounded audit note.
     /// @param id The action to drop.
     /// @param reason Structured cancellation reason.

@@ -338,7 +338,7 @@ contract RouterAdminTest is Fixture {
         vm.expectEmit(true, true, true, true, address(router));
         emit IHyperionRouter.ActionCancelled(id, guardian);
         vm.prank(guardian);
-        router.cancelAction(id);
+        router.cancelActionWithReason(id, CancelReason.Unspecified, "");
 
         assertEq(router.queuedAction(id).id, id, "the audit payload is retained");
         assertTrue(router.actionCancelled(id));
@@ -358,13 +358,13 @@ contract RouterAdminTest is Fixture {
         uint64 id = router.queueAction(action);
 
         vm.prank(admin);
-        router.cancelAction(id);
+        router.cancelActionWithReason(id, CancelReason.Unspecified, "");
         assertEq(router.queuedAction(id).id, id);
         assertTrue(router.actionCancelled(id));
         assertEq(router.queuedAction(id).action.amount, 20);
         vm.expectRevert(TimelockNotQueued.selector);
         vm.prank(admin);
-        router.cancelAction(id);
+        router.cancelActionWithReason(id, CancelReason.Unspecified, "");
     }
 
     function test_a_stranger_cannot_cancel() public {
@@ -375,13 +375,13 @@ contract RouterAdminTest is Fixture {
 
         vm.prank(stranger);
         vm.expectRevert(Unauthorized.selector);
-        router.cancelAction(id);
+        router.cancelActionWithReason(id, CancelReason.Unspecified, "");
     }
 
     function test_cancelling_nothing_is_refused() public {
         vm.prank(guardian);
         vm.expectRevert(TimelockNotQueued.selector);
-        router.cancelAction(999);
+        router.cancelActionWithReason(999, CancelReason.Unspecified, "");
     }
 
     function test_a_change_that_already_landed_cannot_be_cancelled() public {
@@ -395,7 +395,7 @@ contract RouterAdminTest is Fixture {
 
         vm.prank(guardian);
         vm.expectRevert(TimelockAlreadyExecuted.selector);
-        router.cancelAction(id);
+        router.cancelActionWithReason(id, CancelReason.Unspecified, "");
     }
 
     // -------------------------------------------------------------------------------------

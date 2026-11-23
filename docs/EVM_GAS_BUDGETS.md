@@ -74,7 +74,7 @@ cd evm && forge test --match-contract 'Router.*GasBudgetTest' --gas-report -vv
 ```
 
 The budget suite uses the default Foundry profile pinned in `evm/foundry.toml`: Solidity 0.8.28,
-Cancun, optimizer enabled with 200 runs, and `via_ir = true`. Do not compare reports from a
+Cancun, optimizer enabled with 50 runs, and `via_ir = true`. Do not compare reports from a
 different compiler or optimizer profile against these ceilings.
 
 This adds no selector, storage field, or wire-format change, so it requires no router migration or

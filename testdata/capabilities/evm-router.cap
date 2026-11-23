@@ -33,7 +33,6 @@ method bridgeOutWithIntent
 method bridgeOutWithPermit
 method bridgeOutWithRefundCredit
 method bridgeOutWithRelayerFee
-method cancelAction
 method cancelActionWithReason
 method checkDestination
 method checkOutbound
@@ -80,7 +79,6 @@ method tokenConfig
 method treasury
 method unpause
 method unpauseRoute
-method withdrawRefundCredit
 
 # Routes this surface can carry, as protocol slugs.
 route cctp

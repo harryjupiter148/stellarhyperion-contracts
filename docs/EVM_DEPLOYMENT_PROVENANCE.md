@@ -1,7 +1,7 @@
 # EVM deployment and provenance
 
 The normal production build uses Solidity `0.8.28+commit.7893614a`, Cancun, optimizer enabled
-with 200 runs and `viaIR=true`. Deployment and verification read these settings from the
+with 50 runs and `viaIR=true`. Deployment and verification read these settings from the
 actual compiled artifact metadata; environment labels alone cannot certify the build.
 Foundry uses the same profile locally and in CI, with additional CI fuzz and invariant runs.
 

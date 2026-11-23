@@ -43,7 +43,7 @@ contract RefundCreditCaller {
     }
 
     function withdrawSelf() external {
-        ROUTER.withdrawRefundCredit();
+        ROUTER.withdrawRefundCredit(payable(address(this)));
     }
 
     function withdrawTo(address payable recipient) external {
@@ -62,7 +62,8 @@ contract RefundCreditCaller {
         if (mode == ReceiveMode.ReenterDispatch) ROUTER.bridgeOutWithRefundCredit(_replay);
         if (mode == ReceiveMode.ObserveAndReenter) {
             creditDuringCallback = ROUTER.refundCredits(address(this));
-            (withdrawalReentered,) = address(ROUTER).call(abi.encodeWithSignature("withdrawRefundCredit()"));
+            (withdrawalReentered,) = address(ROUTER)
+                .call(abi.encodeCall(HyperionRouter.withdrawRefundCredit, (payable(address(ROUTER)))));
             (dispatchReentered,) =
                 address(ROUTER).call(abi.encodeCall(IHyperionRouter.bridgeOutWithRefundCredit, (_replay)));
         }
